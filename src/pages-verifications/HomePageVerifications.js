@@ -1,47 +1,39 @@
 import BasePageVerifications from './BasePageVerifications';
-import {
-    verticalCarousel,
-    flightsFromAirports,
-    feedbackLabel,
-    popularDestinationsSection,
-    topThreeThemesSection
-} from '../model/Constants';
+const verticalCarousel = '.verticarousel.new-homepage';
+const popularDestinationsSection = '#popular-destinations';
+const topThreeThemesSection = '.content.geo.top-three-themes';
+const flightsFromAirports = '.flights-from-airports';
 
 export default class HomePageVerifications extends BasePageVerifications {
-    verticalCarouselLoaded() {
+    verticalCarouselLoaded(lenght) {
         $(verticalCarousel).waitForDisplayed();
-        expect($$('.main article').length).to.equal(8);
+        expect($$('.main article').length).to.equal(lenght);
         return this;
     }
 
-    flightsFromAirportsLoaded() {
+    flightsFromAirportsLoaded(lenght) {
         $(flightsFromAirports).waitForDisplayed();
-        expect($$('.flights-from-airports > ul > li').length).to.equal(6);
-        return this;
-    }
-    // not used yet
-    feedbackLabelLoaded() {
-        $(feedbackLabel).waitForDisplayed();
+        expect($$('.flights-from-airports > ul > li').length).to.equal(lenght);
         return this;
     }
 
-    popularDestinationsSectionLoaded() {
+    popularDestinationsSectionLoaded(lenght) {
         $(popularDestinationsSection).waitForDisplayed();
-        expect($$('div.stark-slider__rail > div').length).to.equal(24);
+        expect($$('div.stark-slider__rail > div').length).to.equal(lenght);
         return this;
     }
 
-    topThreeThemesSectionLoaded() {
+    topThreeThemesSectionLoaded(lenght) {
         $(topThreeThemesSection).waitForDisplayed();
-        expect($$('.content.geo.top-three-themes a').length).to.equal(3);
+        expect($$('.content.geo.top-three-themes a').length).to.equal(lenght);
         return this;
     }
 
     homePageElementsLoaded() {
-        this.verticalCarouselLoaded()
-            .flightsFromAirportsLoaded()
-            .topThreeThemesSectionLoaded()
-            .popularDestinationsSectionLoaded();
+        this.verticalCarouselLoaded(8)
+            .flightsFromAirportsLoaded(6)
+            .topThreeThemesSectionLoaded(3)
+            .popularDestinationsSectionLoaded(24);
         return this;
     }
 }

@@ -1,4 +1,5 @@
 import { at, open, assertThat } from '../src/utils/page-factory';
+import { select, user1, user2, contactInfo, emergencyContact, verifyPersonData } from '../src/model/Constants';
 import homePage from '../src/pages/HomePage';
 import onHomePage from '../src/pages-verifications/HomePageVerifications';
 import onZonvakantiesPage from '../src/pages-verifications/ZonvakantiesVerifications';
@@ -7,13 +8,14 @@ import searchResultsPage from '../src/pages/SearchResultsPage';
 import onSearchResultsPage from '../src/pages-verifications/SearchResultsPageVeifications';
 import firstAccomodationPage from '../src/pages/FirstAccomodationPage';
 import onFirstAccomodationPage from '../src/pages-verifications/FirstAccomodationPageVerifications';
-import bookVacationPage1Step from '../src/pages/BookVacationPageFirstStep';
-import onBookVacationPage1Step from '../src/pages-verifications/BookVacationPageFirstStepVerifications';
-import { select, user1, user2, contactInfo, emergencyContact } from '../src/model/Constants';
-import bookVacationPage2Step from '../src/pages/BookVacationPageSecondStep';
-import onbookVacationPage2Step from '../src/pages-verifications/BookVacationPageSecondStepVerifications';
-import bookVacationPage3Step from '../src/pages/BookVacationPageThirdStep';
-import onbookVacationPage3Step from '../src/pages-verifications/BookVacationPageThirdStepVerifications';
+import bookVacation1Step from '../src/pages/BookVacation1Step';
+import onBookVacation1Step from '../src/pages-verifications/BookVacation1StepVerifications';
+import bookVacation2Step from '../src/pages/BookVacation2Step';
+import onbookVacation2Step from '../src/pages-verifications/BookVacation2StepVerifications';
+import bookVacation3Step from '../src/pages/BookVacation3Step';
+import onbookVacation3Step from '../src/pages-verifications/BookVacation3StepVerifications';
+import onVerifyInformationModal from '../src/pages-verifications/VerifyInformationModalVerififcations';
+import verifyInformationModal from '../src/pages/VerifyInformationModal';
 
 describe('Happy Flow Customer journey', () => {
     before('Go to website, go to Zonvakanties page from Homepage', () => {
@@ -30,25 +32,37 @@ describe('Happy Flow Customer journey', () => {
             .mainElementsAreLoaded();
     });
 
-    it('', () => {
+    it('Verify that User can go through the Happy User Workflow (book the Vacation trip) successfully', () => {
         //        Step 2
-        at(zonvakantiesPage)
-            .expandDestinationDropDown()
-            .selectDestination(select.country);
-        assertThat(onZonvakantiesPage).destinationSelected(select.country);
-        at(zonvakantiesPage)
-            .expandDateDropDown()
-            .expandMonthDropDown()
-            .selectMonth(select.month);
+        at(zonvakantiesPage).expandDestinationDropDown();
+        assertThat(onZonvakantiesPage).destinationDropDownExpanded();
+        at(zonvakantiesPage).selectDestination(select.country);
+
+        at(zonvakantiesPage).expandDateDropDown();
+        assertThat(onZonvakantiesPage).destinationDateDropDownExpanded();
+
+        at(zonvakantiesPage).expandMonthDropDown();
+        assertThat(onZonvakantiesPage).monthDropDownExpanded();
+
+        at(zonvakantiesPage).selectMonth(select.month);
         assertThat(onZonvakantiesPage).monthSelected(select.month);
+
         at(zonvakantiesPage).selectDay(select.date);
-        assertThat(onZonvakantiesPage).dateSelected(select.date);
-        at(zonvakantiesPage)
-            .expandDurationDropDown()
-            .selectDuration(select.duration);
-        assertThat(onZonvakantiesPage).durationSelected(select.duration);
+        at(zonvakantiesPage).expandDurationDropDown();
+
+        assertThat(onZonvakantiesPage).durationDropDownExpanded();
+        at(zonvakantiesPage).selectDuration(select.duration);
+
+        at(zonvakantiesPage).expandTravelPartyDropDown();
+        assertThat(onZonvakantiesPage).travelPartyDropDownExpanded();
         at(zonvakantiesPage).selectTravelParty(select.personen);
-        assertThat(onZonvakantiesPage).travelPartySelected(select.personen);
+
+        assertThat(onZonvakantiesPage).searchParametersSelected(
+            select.country,
+            select.date,
+            select.duration,
+            select.personen
+        );
 
         at(zonvakantiesPage).clickContinueSearchButton();
         assertThat(onSearchResultsPage)
@@ -58,10 +72,14 @@ describe('Happy Flow Customer journey', () => {
         //      Step 3
         at(searchResultsPage)
             .checkTransportArranged()
-            .selectAiroport(select.airoport)
-            .selectBoardType(select.board);
+            .selectAiroport(select.airoport);
+        assertThat(onSearchResultsPage).spinnerDisappeared();
+        at(searchResultsPage).selectBoardType(select.board);
+        assertThat(onSearchResultsPage).spinnerDisappeared();
+
         assertThat(onSearchResultsPage)
             .searchResultsPageElementsLoaded()
+            .airoportBoardTypeSelected(select.airoport, select.board)
             .verifyFacetsSelected(select.airoport, select.board, select.transport);
 
         // gather Info on 1st Accomodation being on Search Result page
@@ -80,27 +98,13 @@ describe('Happy Flow Customer journey', () => {
         assertThat(onFirstAccomodationPage).verifyOfferIsLoaded();
         at(firstAccomodationPage).clickBookNowButton();
 
-        assertThat(onBookVacationPage1Step).firstStepElementsLoaded();
+        assertThat(onBookVacation1Step).firstStepElementsLoaded();
         //         Step 5
-        at(bookVacationPage1Step).setVolwassene(
-            1,
-            user1.gender,
-            user1.fName,
-            user1.lName,
-            user1.dob,
-            user1.nationality
-        );
+        at(bookVacation1Step).setVolwassene(1, user1.gender, user1.fName, user1.lName, user1.dob, user1.nationality);
 
-        at(bookVacationPage1Step).setVolwassene(
-            2,
-            user2.gender,
-            user2.fName,
-            user2.lName,
-            user2.dob,
-            user2.nationality
-        );
+        at(bookVacation1Step).setVolwassene(2, user2.gender, user2.fName, user2.lName, user2.dob, user2.nationality);
 
-        at(bookVacationPage1Step).setContactInfo(
+        at(bookVacation1Step).setContactInfo(
             contactInfo.email,
             contactInfo.postcode,
             contactInfo.houseNum,
@@ -110,19 +114,30 @@ describe('Happy Flow Customer journey', () => {
             contactInfo.land
         );
 
-        at(bookVacationPage1Step).setEmergencyInfo(emergencyContact.name, emergencyContact.phone);
-        at(bookVacationPage1Step).clickStep2Button();
+        at(bookVacation1Step).setEmergencyInfo(emergencyContact.name, emergencyContact.phone);
+        at(bookVacation1Step).clickStep2Button();
+
+        // sub-step 5 (new feature added) -'Verify your information' modal
+        // appears randomly
+        if ($('.modal__content').isDisplayed()) {
+            assertThat(onVerifyInformationModal).verifyInfoModalLoaded();
+            at(verifyInformationModal).confirmData(1, verifyPersonData.checkbox1, verifyPersonData.checkbox2);
+            at(verifyInformationModal).confirmData(2, verifyPersonData.checkbox1, verifyPersonData.checkbox2);
+            assertThat(onVerifyInformationModal).confirmationButtonActive();
+            at(verifyInformationModal).clickConfirmationButton();
+        }
+
         //         Step 6
         // - On the next step (step 2) of the book flow don’t add any additional products
         // - Continue to the overview page
-        assertThat(onbookVacationPage2Step).secondStepElementsLoaded();
-        const secondStepPrice = at(bookVacationPage2Step).getPrice();
-        at(bookVacationPage2Step).clickThirdStepButton();
+        assertThat(onbookVacation2Step).secondStepElementsLoaded();
+        const secondStepPrice = at(bookVacation2Step).getPrice();
+        at(bookVacation2Step).clickThirdStepButton();
         //         Step 7
         // - On the last step of the book flow check that the final price corresponds to the price
         // shown when we went into the check-out
-        assertThat(onbookVacationPage3Step).thirdStepElementsLoaded();
-        const thirdStepPrice = at(bookVacationPage3Step).getPrice();
-        assertThat(onbookVacationPage3Step).pricesMatch(secondStepPrice, thirdStepPrice);
+        assertThat(onbookVacation3Step).thirdStepElementsLoaded();
+        const thirdStepPrice = at(bookVacation3Step).getPrice();
+        assertThat(onbookVacation3Step).pricesMatch(secondStepPrice, thirdStepPrice);
     });
 });

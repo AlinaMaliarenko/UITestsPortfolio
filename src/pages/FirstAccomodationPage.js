@@ -1,12 +1,10 @@
 import BasePage from './BasePage';
-import {
-    accPageDestinationCountry,
-    accPagePrice,
-    accPageHeader,
-    accPageTravelDate,
-    checkPriceButton,
-    bookNowButton
-} from '../model/Constants';
+
+export const accPageDestinationCountry = '#accommodation-header span span:nth-child(1) span';
+export const accPageHeader = '.acco-header-title h1';
+export const accPageTravelDate = 'a.travel-date dd';
+const checkPriceButton = '.column.container-details .details div.main .btn--theme--primary';
+const bookNowButton = '#offer-receipt-bookbutton';
 
 export default class FirstAccomodationPage extends BasePage {
     getAccomodationPageInfo() {
@@ -16,12 +14,10 @@ export default class FirstAccomodationPage extends BasePage {
                 .getText()
                 .replace('s *', 's*'),
             $(accPageDestinationCountry).getText(),
-            //$(accPagePrice).getText(), - bug with price displaying - different on search and details pages
             $(accPageTravelDate)
                 .getText()
                 .split(' (')[0]
         );
-        console.log(`ACC PAGE ARRAY: ${arr}`);
         return arr;
     }
     clickCheckPriceButton() {

@@ -1,80 +1,66 @@
 import BasePageVerifications from './BasePageVerifications';
 import {
-    zonvakantiesHeader,
-    dateSelector,
-    durationSelector,
     travelPartySelector,
-    includingFlightSelector,
-    ownTransportSelector,
-    showVacationsButton,
-    aboutArticle,
-    topTenAccomodations,
-    lookAllAccomodationsButton,
-    searchHeader,
     destinationDropDown,
-    pickedDestination,
-    destinationMonthDropDown,
-    departureDateMonth
-} from '../model/Constants';
+    durationSelector,
+    dateSelector,
+    destinationMonthDropDown
+} from '../pages/ZonvakantiesPage';
+const zonvakantiesHeader = 'h1.big-statement';
+const includingFlightSelector = '.transport-arranged.active';
+const showVacationsButton = '#search-box > div > button';
+const pickedDestination = '.menu-toggle.multi-country';
+const departureDateMonth = '#select-departure span.toggle-value';
 
 export default class ZonvakantiesVerifications extends BasePageVerifications {
-    searchHeaderLoaded() {
-        $(searchHeader).waitForDisplayed();
-        return this;
-    }
-    zonvakantiesHeaderLoaded() {
+    zonvakantiesHeaderLoaded(string) {
         $(zonvakantiesHeader).waitForDisplayed();
-        expect($(zonvakantiesHeader).getText()).to.have.string('zonvakanties');
+        expect($(zonvakantiesHeader).getText()).to.have.string(string);
         return this;
     }
-
     destinationDropDownLoaded() {
         $(destinationDropDown).waitForDisplayed();
         return this;
     }
+    destinationDropDownExpanded() {
+        browser.waitUntil(() => expect($('.expander.destination').getAttribute('class')).to.have.string('expanded'));
+        return this;
+    }
 
+    destinationDateDropDownExpanded() {
+        browser.waitUntil(() => expect($('.expander.departure').getAttribute('class')).to.have.string('expanded'));
+        return this;
+    }
+    monthDropDownExpanded() {
+        browser.waitUntil(() => expect($(destinationMonthDropDown).getAttribute('class')).to.have.string('expanded'));
+        return this;
+    }
+    durationDropDownExpanded() {
+        browser.waitUntil(() => expect($('.expander.duration').getAttribute('class')).to.have.string('expanded'));
+        return this;
+    }
+    travelPartyDropDownExpanded() {
+        expect($(travelPartySelector).getAttribute('class')).to.have.string('active');
+        return this;
+    }
     dateSelectorLoaded() {
         $(dateSelector).waitForDisplayed();
         return this;
     }
-
     durationSelectorLoaded() {
         $(durationSelector).waitForDisplayed();
         return this;
     }
-
     travelPartySelectorLoaded() {
         $(travelPartySelector).waitForDisplayed();
         return this;
     }
-
     includingFlightSelectorLoaded() {
         $(includingFlightSelector).waitForDisplayed();
         return this;
     }
-
-    ownTransportSelectorLoaded() {
-        $(ownTransportSelector).waitForDisplayed();
-        return this;
-    }
-
     showVacationsButtonLoaded() {
         $(showVacationsButton).waitForDisplayed();
-        return this;
-    }
-
-    aboutArticleLoaded() {
-        $(aboutArticle).waitForDisplayed();
-        return this;
-    }
-
-    topTenAccomodationsLoaded() {
-        $(topTenAccomodations).waitForDisplayed();
-        return this;
-    }
-
-    lookAllAccomodationsButtonLoaded() {
-        $(lookAllAccomodationsButton).waitForDisplayed();
         return this;
     }
 
@@ -100,18 +86,21 @@ export default class ZonvakantiesVerifications extends BasePageVerifications {
     }
 
     zonvakantiesPageLoaded() {
-        this.searchHeaderLoaded()
-            .zonvakantiesHeaderLoaded()
+        this.zonvakantiesHeaderLoaded('zonvakanties')
             .destinationDropDownLoaded()
             .dateSelectorLoaded()
             .durationSelectorLoaded()
             .travelPartySelectorLoaded()
             .includingFlightSelectorLoaded()
-            .ownTransportSelectorLoaded()
-            .showVacationsButtonLoaded()
-            .aboutArticleLoaded()
-            .topTenAccomodationsLoaded()
-            .lookAllAccomodationsButtonLoaded();
+            .showVacationsButtonLoaded();
+        return this;
+    }
+
+    searchParametersSelected(country, date, duration, personen) {
+        this.destinationSelected(country)
+            .dateSelected(date)
+            .durationSelected(duration)
+            .travelPartySelected(personen);
         return this;
     }
 }

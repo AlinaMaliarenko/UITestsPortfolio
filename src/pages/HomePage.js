@@ -1,5 +1,6 @@
 import BasePage from './BasePage';
-import { continueWithCookiesButton, zonvakantiesSeeButton } from '../model/Constants';
+const continueWithCookiesButton = '.btn.btn--theme--primary.btn--large';
+const zonvakantiesSeeButton = '.vertical.sun .btn.btn--theme--primary';
 
 export default class HomePage extends BasePage {
     open() {

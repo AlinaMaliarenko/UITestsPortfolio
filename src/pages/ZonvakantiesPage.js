@@ -1,16 +1,18 @@
 import BasePage from './BasePage';
-import {
-    dateSelector,
-    destinationMonthDropDown,
-    durationSelector,
-    travelPartySelector,
-    travelPartySaveButton,
-    travelPartyAdultsDropDown,
-    continueSearchButton,
-    destinationDropDown,
-    pickedDestination,
-    departureDateMonth
-} from '../model/Constants';
+
+export const dateSelector = '.expander.departure.period-options > div.inner-container';
+export const destinationMonthDropDown = '.current-month';
+export const durationSelector = '#select-duration';
+export const travelPartySelector = '#select-party';
+const travelPartySaveButton = '.btn.btn--theme--primary.btn--wide';
+const travelPartyAdultsDropDown = '#adults-0';
+const continueSearchButton = '.btn.btn--theme--primary.box-submit';
+export const destinationDropDown = '#select-destination';
+const countryPicker = country => `//ul[3]//a[text() = '${country}']`;
+const monthPicker = month => `//*[text() = '${month}']`;
+const dayPicker = date => `//*[@class="dates"]//span[text()="${date}"]`;
+const durationPicker = duration => `//label[input[@value="${duration}"]]`;
+const personenPicker = personen => `option[value="${personen}"]`;
 
 export default class ZonvakantiesPage extends BasePage {
     open() {
@@ -19,53 +21,46 @@ export default class ZonvakantiesPage extends BasePage {
     }
     expandDestinationDropDown() {
         $(destinationDropDown).click();
-        browser.waitUntil(() => expect($('.expander.destination').getAttribute('class')).to.have.string('expanded'));
         return this;
     }
     expandDateDropDown() {
         $(dateSelector).click();
-        browser.waitUntil(() => expect($('.expander.departure').getAttribute('class')).to.have.string('expanded'));
         return this;
     }
     expandMonthDropDown() {
         $(destinationMonthDropDown).click();
-        browser.waitUntil(() => expect($(destinationMonthDropDown).getAttribute('class')).to.have.string('expanded'));
         return this;
     }
     expandDurationDropDown() {
         $(durationSelector).click();
-        browser.waitUntil(() => expect($('.expander.duration').getAttribute('class')).to.have.string('expanded'));
         return this;
     }
     selectDestination(country) {
-        const countryPicker = `//ul[3]//a[text() = '${country}']`;
-        $(countryPicker).click();
+        $(countryPicker(country)).click();
         return this;
     }
     selectMonth(month) {
-        const monthPicker = `//*[text() = '${month}']`;
-        $(monthPicker).click();
+        $(monthPicker(month)).click();
         return this;
     }
     selectDay(date) {
-        const dayPicker = `//*[@class="dates"]//span[text()="${date}"]`;
-        $(dayPicker).waitForDisplayed();
-        $(dayPicker).click();
+        $(dayPicker(date)).waitForDisplayed();
+        $(dayPicker(date)).click();
         return this;
     }
 
     selectDuration(duration) {
-        const durationPicker = `//label[input[@value="${duration}"]]`;
-        $(durationPicker).click();
+        $(durationPicker(duration)).click();
+        return this;
+    }
+    expandTravelPartyDropDown() {
+        $(travelPartySelector).click();
         return this;
     }
     selectTravelParty(personen) {
-        $(travelPartySelector).click();
-        expect($(travelPartySelector).getAttribute('class')).to.have.string('active');
         $(travelPartyAdultsDropDown).click();
-        $(`option[value="${personen}"]`).click();
+        $(personenPicker(personen)).click();
         $(travelPartySaveButton).click();
-        // expect($('#select-party .toggle-value').getText()).to.have.string(`${personen}`);
         return this;
     }
 

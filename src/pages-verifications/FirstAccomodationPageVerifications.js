@@ -1,24 +1,13 @@
 import BasePageVerifications from './BasePageVerifications';
-import {
-    accPageHeader,
-    accPageDestinationCountry,
-    accPagePrice,
-    accPageTravelDate,
-    accPageMainImage,
-    accPagePhotoGallery,
-    accPagePriceBarChart,
-    accPageSummaryLocation,
-    accPageDescription,
-    accPageFacilities,
-    accPageWeather,
-    accPageGoogleMap,
-    accPageReviews,
-    offerInfoHeader,
-    offerInfoButton,
-    offerFlight,
-    offerStay,
-    offerReceipt
-} from '../model/Constants';
+import { accPageDestinationCountry, accPageHeader } from '../pages/FirstAccomodationPage';
+const accPageMainImage = '.container-image';
+const accPagePhotoGallery = '.film-strip-photo-gallery';
+const offerInfoHeader = '#summary-location .offer-information h4';
+const offerInfoButton = '.summary-offer__information-specs .btn--compact.infobutton';
+const offerFlight = '.offer-info.offer-flight';
+const offerStay = '.offer-info.offer-stay';
+const offerReceipt = '#offer-receipt';
+const mainInfoBlock = 'div.details';
 
 export default class FirstAccomodationPageVerifications extends BasePageVerifications {
     accPageHeaderLoaded() {
@@ -29,12 +18,8 @@ export default class FirstAccomodationPageVerifications extends BasePageVerifica
         $(accPageDestinationCountry).waitForDisplayed();
         return this;
     }
-    accPagePriceLoaded() {
-        $(accPagePrice).waitForDisplayed();
-        return this;
-    }
-    accPageTravelDateLoaded() {
-        $(accPageTravelDate).waitForDisplayed();
+    mainInfoBlockLoaded() {
+        $(mainInfoBlock).waitForDisplayed();
         return this;
     }
     accPageMainImageLoaded() {
@@ -43,52 +28,13 @@ export default class FirstAccomodationPageVerifications extends BasePageVerifica
     }
     accPagePhotoGalleryLoaded() {
         $(accPagePhotoGallery).waitForDisplayed();
-        browser.waitUntil(() => expect($$(accPagePhotoGallery).length).to.equal(3));
-        return this;
-    }
-    accPagePriceBarChartLoaded() {
-        $(accPagePriceBarChart).waitForDisplayed();
-        return this;
-    }
-    accPageSummaryLocationLoaded() {
-        $(accPageSummaryLocation).waitForDisplayed();
-        return this;
-    }
-    accPageDescriptionLoaded() {
-        $(accPageDescription).waitForDisplayed();
-        return this;
-    }
-    accPageFacilitiesLoaded() {
-        $(accPageFacilities).waitForDisplayed();
-        return this;
-    }
-    accPageWeatherLoaded() {
-        $(accPageWeather).waitForDisplayed();
-        return this;
-    }
-    accPageGoogleMapLoaded() {
-        $(accPageGoogleMap).waitForDisplayed();
-        return this;
-    }
-    accPageReviewsLoaded() {
-        $(accPageReviews).waitForDisplayed();
         return this;
     }
     accPageElementsLoaded() {
         this.accPageHeaderLoaded()
             .accPageCountryLoaded()
-            .accPagePriceLoaded()
-            .accPageTravelDateLoaded()
             .accPageMainImageLoaded()
-            .accPagePhotoGalleryLoaded()
-            .accPagePriceBarChartLoaded()
-            .accPageSummaryLocationLoaded()
-            .accPageDescriptionLoaded()
-            .accPageFacilitiesLoaded()
-            .accPageWeatherLoaded()
-            .accPageGoogleMapLoaded()
-            .accPageReviewsLoaded();
-
+            .accPagePhotoGalleryLoaded();
         return this;
     }
 
