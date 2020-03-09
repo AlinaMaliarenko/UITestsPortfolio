@@ -1,143 +1,114 @@
-import { at, open, assertThat } from '../src/utils/page-factory';
-import { select, user1, user2, contactInfo, emergencyContact, verifyPersonData } from '../src/model/Constants';
+import Element from '../src/components/Element';
+import { at, assertThat } from '../src/utils/page-factory';
+import { pick, user1, user2, contact, emergency, verifyPerson, openHomePage } from '../src/model/Constants';
+import zonvakantiesPage, {
+    transportArranged,
+    destinationDropDown,
+    monthDropDown,
+    dateSelector,
+    durationDropDown,
+    travelParty,
+    continueSearch
+} from '../src/pages/ZonvakantiesPage';
+
 import homePage from '../src/pages/HomePage';
-import onHomePage from '../src/pages-verifications/HomePageVerifications';
 import onZonvakantiesPage from '../src/pages-verifications/ZonvakantiesVerifications';
-import zonvakantiesPage from '../src/pages/ZonvakantiesPage';
 import searchResultsPage from '../src/pages/SearchResultsPage';
 import onSearchResultsPage from '../src/pages-verifications/SearchResultsPageVeifications';
-import firstAccomodationPage from '../src/pages/FirstAccomodationPage';
-import onFirstAccomodationPage from '../src/pages-verifications/FirstAccomodationPageVerifications';
+import accomodationPage from '../src/pages/AccomodationPage';
+import onAccomodationPage from '../src/pages-verifications/AccomodationPageVerifications';
 import bookVacation1Step from '../src/pages/BookVacation1Step';
-import onBookVacation1Step from '../src/pages-verifications/BookVacation1StepVerifications';
+import verifyInformationModal from '../src/pages/VerifyInformationModal';
 import bookVacation2Step from '../src/pages/BookVacation2Step';
 import onbookVacation2Step from '../src/pages-verifications/BookVacation2StepVerifications';
 import bookVacation3Step from '../src/pages/BookVacation3Step';
 import onbookVacation3Step from '../src/pages-verifications/BookVacation3StepVerifications';
-import onVerifyInformationModal from '../src/pages-verifications/VerifyInformationModalVerififcations';
-import verifyInformationModal from '../src/pages/VerifyInformationModal';
+
+const verificationModal = '.modal__content';
+const step2 = '.btn.btn--theme--primary';
+const step3 = '.btn.btn--theme--primary';
 
 describe('Happy Flow Customer journey', () => {
-    before('Go to website, go to Zonvakanties page from Homepage', () => {
-        open(homePage);
-        assertThat(onHomePage).cookiesBarLoaded();
-        at(homePage).closeCookiesBar();
-        assertThat(onHomePage)
-            .homePageElementsLoaded()
-            .mainElementsAreLoaded();
-
-        at(homePage).clickZonvakantiesSeeButton();
-        assertThat(onZonvakantiesPage)
-            .zonvakantiesPageLoaded()
-            .mainElementsAreLoaded();
+    before('Go to website, go to "Zonvakanties" page from Homepage', () => {
+        openHomePage();
+        at(homePage).selectZonvakanties();
     });
 
-    it('Verify that User can go through the Happy User Workflow (book the Vacation trip) successfully', () => {
-        //        Step 2
-        at(zonvakantiesPage).expandDestinationDropDown();
-        assertThat(onZonvakantiesPage).destinationDropDownExpanded();
-        at(zonvakantiesPage).selectDestination(select.country);
-
-        at(zonvakantiesPage).expandDateDropDown();
-        assertThat(onZonvakantiesPage).destinationDateDropDownExpanded();
-
-        at(zonvakantiesPage).expandMonthDropDown();
-        assertThat(onZonvakantiesPage).monthDropDownExpanded();
-
-        at(zonvakantiesPage).selectMonth(select.month);
-        assertThat(onZonvakantiesPage).monthSelected(select.month);
-
-        at(zonvakantiesPage).selectDay(select.date);
-        at(zonvakantiesPage).expandDurationDropDown();
-
-        assertThat(onZonvakantiesPage).durationDropDownExpanded();
-        at(zonvakantiesPage).selectDuration(select.duration);
-
-        at(zonvakantiesPage).expandTravelPartyDropDown();
-        assertThat(onZonvakantiesPage).travelPartyDropDownExpanded();
-        at(zonvakantiesPage).selectTravelParty(select.personen);
+    it(`Verify that User can go through the Happy User Workflow 
+       (search for particular trip, proceed to checkout and make sure, 
+        that the price in the Checkout is the same as through all the booking steps).`, () => {
+        at(zonvakantiesPage)
+            .expand(destinationDropDown)
+            .selectDestination(pick.country)
+            .expand(dateSelector)
+            .expand(monthDropDown)
+            .selectMonth(pick.month)
+            .selectDay(pick.date)
+            .expand(durationDropDown)
+            .selectDuration(pick.duration)
+            .expand(travelParty)
+            .selectAdults(pick.personen)
+            .applyTravelParty()
+            .selectTransport(transportArranged);
 
         assertThat(onZonvakantiesPage).searchParametersSelected(
-            select.country,
-            select.date,
-            select.duration,
-            select.personen
+            pick.country,
+            pick.date,
+            pick.month,
+            pick.duration,
+            pick.personen
         );
 
-        at(zonvakantiesPage).clickContinueSearchButton();
-        assertThat(onSearchResultsPage)
-            .searchResultsPageElementsLoaded()
-            .mainElementsAreLoaded();
+        at(zonvakantiesPage).proceed(continueSearch);
 
-        //      Step 3
-        at(searchResultsPage)
-            .checkTransportArranged()
-            .selectAiroport(select.airoport);
+        at(searchResultsPage).selectAiroport(pick.airoport);
         assertThat(onSearchResultsPage).spinnerDisappeared();
-        at(searchResultsPage).selectBoardType(select.board);
+        at(searchResultsPage).selectBoardType(pick.board);
+
         assertThat(onSearchResultsPage).spinnerDisappeared();
 
-        assertThat(onSearchResultsPage)
-            .searchResultsPageElementsLoaded()
-            .airoportBoardTypeSelected(select.airoport, select.board)
-            .verifyFacetsSelected(select.airoport, select.board, select.transport);
+        const actualFacets = at(searchResultsPage).gatherActualFacets();
+        const expectedFacets = at(searchResultsPage).getExpectedFacets(pick.transport, pick.airoport, pick.board);
 
-        // gather Info on 1st Accomodation being on Search Result page
-        const searchAccomodationInfo = at(searchResultsPage).getSearchResultsAccomodationInfo(1);
-        // - And choose the first Accommodation on Search result page
-        at(searchResultsPage).selectAccomodation(select.index);
-        // verify that Accomodation page is loaded
-        assertThat(onFirstAccomodationPage).accPageElementsLoaded();
-        // gather Info on 1st Accomodation on Accomodation Details page
-        const accomodationPageInfo = at(firstAccomodationPage).getAccomodationPageInfo();
-        // verify that User was redirected to correct Accomodation by comparing 1st in (search) and 2nd info (date. page)
-        assertThat(onFirstAccomodationPage).searchAndPageAccInfoMatch(searchAccomodationInfo, accomodationPageInfo);
+        assertThat(onSearchResultsPage).arraysInclude(actualFacets, expectedFacets);
 
-        //         Step 4
-        at(firstAccomodationPage).clickCheckPriceButton();
-        assertThat(onFirstAccomodationPage).verifyOfferIsLoaded();
-        at(firstAccomodationPage).clickBookNowButton();
+        const searchAccomodationInfo = at(searchResultsPage).getAccomodationInfo(pick.index);
 
-        assertThat(onBookVacation1Step).firstStepElementsLoaded();
-        //         Step 5
-        at(bookVacation1Step).setVolwassene(1, user1.gender, user1.fName, user1.lName, user1.dob, user1.nationality);
+        at(searchResultsPage).selectAccomodation(pick.index);
+        const accomodationPageInfo = at(accomodationPage).getAccomodationInfo();
+        assertThat(onAccomodationPage).arraysEqual(accomodationPageInfo, searchAccomodationInfo);
 
-        at(bookVacation1Step).setVolwassene(2, user2.gender, user2.fName, user2.lName, user2.dob, user2.nationality);
+        at(accomodationPage)
+            .clickCheckPrice()
+            .clickBookNow();
 
-        at(bookVacation1Step).setContactInfo(
-            contactInfo.email,
-            contactInfo.postcode,
-            contactInfo.houseNum,
-            contactInfo.street,
-            contactInfo.residence,
-            contactInfo.telephone,
-            contactInfo.land
-        );
+        at(bookVacation1Step)
+            .setVolwassene(1, user1.gender, user1.fName, user1.lName, user1.dob, user1.nationality)
+            .setVolwassene(2, user2.gender, user2.fName, user2.lName, user2.dob, user2.nationality)
+            .setContact(
+                contact.email,
+                contact.postcode,
+                contact.houseNum,
+                contact.street,
+                contact.residence,
+                contact.phone,
+                contact.land
+            )
+            .setEmergencyInfo(emergency.name, emergency.phone)
+            .proceed(step2);
 
-        at(bookVacation1Step).setEmergencyInfo(emergencyContact.name, emergencyContact.phone);
-        at(bookVacation1Step).clickStep2Button();
-
-        // sub-step 5 (new feature added) -'Verify your information' modal
-        // appears randomly
-        if ($('.modal__content').isDisplayed()) {
-            assertThat(onVerifyInformationModal).verifyInfoModalLoaded();
-            at(verifyInformationModal).confirmData(1, verifyPersonData.checkbox1, verifyPersonData.checkbox2);
-            at(verifyInformationModal).confirmData(2, verifyPersonData.checkbox1, verifyPersonData.checkbox2);
-            assertThat(onVerifyInformationModal).confirmationButtonActive();
-            at(verifyInformationModal).clickConfirmationButton();
+        if (Element.of(verificationModal)) {
+            at(verifyInformationModal)
+                .clickCheckBoxes(verifyPerson.first, verifyPerson.checkbox1, verifyPerson.checkbox2)
+                .clickCheckBoxes(verifyPerson.second, verifyPerson.checkbox1, verifyPerson.checkbox2)
+                .confirm();
         }
 
-        //         Step 6
-        // - On the next step (step 2) of the book flow don’t add any additional products
-        // - Continue to the overview page
-        assertThat(onbookVacation2Step).secondStepElementsLoaded();
-        const secondStepPrice = at(bookVacation2Step).getPrice();
-        at(bookVacation2Step).clickThirdStepButton();
-        //         Step 7
-        // - On the last step of the book flow check that the final price corresponds to the price
-        // shown when we went into the check-out
-        assertThat(onbookVacation3Step).thirdStepElementsLoaded();
-        const thirdStepPrice = at(bookVacation3Step).getPrice();
-        assertThat(onbookVacation3Step).pricesMatch(secondStepPrice, thirdStepPrice);
+        assertThat(onbookVacation2Step).step2opened();
+        const step2Price = at(bookVacation2Step).getPrice();
+        at(bookVacation2Step).proceed(step3);
+        assertThat(onbookVacation3Step).step3opened();
+        const step3Price = at(bookVacation3Step).getPrice();
+        assertThat(onbookVacation3Step).valuesEqual(step2Price, step3Price);
     });
 });

@@ -18,7 +18,7 @@ exports.config = {
     // NPM script (see https://docs.npmjs.com/cli/run-script) then the current working
     // directory is where your package.json resides, so `wdio` will be called from there.
     //
-    specs: ['./tests/firstTest.test.js'],
+    specs: ['./tests/*.test.js'],
     // Patterns to exclude.
     exclude: [
         // 'path/to/excluded/files'
@@ -96,7 +96,8 @@ exports.config = {
     baseUrl: 'https://www.vakantiediscounter.nl/',
     //
     // Default timeout for all waitFor* commands.
-    waitforTimeout: 10000,
+    waitforTimeout: 6000,
+    waitforInterval: 250,
     //
     // Default timeout in milliseconds for request
     // if Selenium Grid doesn't send response

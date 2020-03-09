@@ -1,48 +1,50 @@
 import BasePage from './BasePage';
+import Element from '../components/Element';
 
-const accomodation = index => `#search-results-list > li:nth-child(${index})`;
+export const accomodation = index => `#search-results-list > li:nth-child(${index})`;
 const accomodationLink = index => `${accomodation(index)} > a`;
-const accomodationHeader = index => `${accomodation(index)} .acco-links.bottom .acco-title.single`;
-const accomodationCountry = index => `${accomodation(index)} .acco-links.bottom li:nth-child(1)`;
-const accomodationDate = index => `${accomodation(index)} .travel-date dd`;
-const transportArrangedButton = '.transport-arranged';
+const accomodationType = type => `//span[text()="${type}"]`;
+const accomodationSaveButton = index => `${accomodation(index)} .save-button`;
+
 export const airoportPicker = departureAiroport => `//span[text()="${departureAiroport}"]`;
 export const boardTypePicker = type => `//span[text()="${type}"]`;
 
-export default class SearchResultPage extends BasePage {
-    checkTransportArranged() {
-        const temp = $(transportArrangedButton).getAttribute('class');
-        if (temp.match(/active/g) == null) $(transportArrangedButton).click();
+const sortByPrice = '.sort-options li:nth-child(2) button';
+const actualFacets = '.main-search-content.search-results .search-header li a';
+
+export default class searchResultsPage extends BasePage {
+    gatherActualFacets() {
+        const actuals = $$(actualFacets).map(el => el.getText());
+        return actuals;
+    }
+    getExpectedFacets(facet1, facet2, facet3) {
+        const expected = [facet1, facet2, facet3].map(el => el.toUpperCase());
+        return expected;
+    }
+
+    saveTrip(index) {
+        Element.of(accomodationSaveButton(index)).click();
+    }
+
+    sortByPrice() {
+        Element.of(sortByPrice).click();
         return this;
     }
 
     selectAiroport(departureAiroport) {
-        $(airoportPicker(departureAiroport)).isClickable();
-        $(airoportPicker(departureAiroport)).click();
-        return this;
+        Element.of(airoportPicker(departureAiroport)).click();
     }
 
     selectBoardType(type) {
-        $(boardTypePicker(type)).isClickable();
-        $(boardTypePicker(type)).click();
-        return this;
+        Element.of(boardTypePicker(type)).click();
     }
 
     selectAccomodation(index) {
-        $(accomodationLink(index)).isClickable();
-        $(accomodationLink(index)).click();
+        Element.of(accomodationLink(index)).click();
         return this;
     }
 
-    getSearchResultsAccomodationInfo(index) {
-        let arr = [];
-        arr.push(
-            $(accomodationHeader(index)).getText(),
-            $(accomodationCountry(index)).getText(),
-            $(accomodationDate(index))
-                .getText()
-                .split(' (')[0]
-        );
-        return arr;
+    selectAccomodationType(type) {
+        Element.of(accomodationType(type)).click();
     }
 }

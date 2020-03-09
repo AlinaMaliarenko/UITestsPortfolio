@@ -1,4 +1,5 @@
 import BasePage from './BasePage';
+import Element from '../components/Element';
 
 const passengerGender = (num, gender) => `span[data-cy="passenger-0${num}_name-salutation-${gender}"]`;
 const passengerFirstName = num => `input[data-cy="passenger-0${num}_name-first"]`;
@@ -15,55 +16,56 @@ const passengerEmail = `input[data-cy="passenger-01_email"]`;
 const passengerPostcode = `input[data-cy="passenger-01_address-postcode"]`;
 const passengerStreet = `input[data-cy="passenger-01_address-street"]`;
 const passengerCity = `input[data-cy="passenger-01_address-city"]`;
-const passengerTelephone = `input[data-cy="passenger-01_telephone-primary"]`;
+const passengerPhone = `input[data-cy="passenger-01_telephone-primary"]`;
 const passengerHouseNumber = `#housenumber`;
-const emergencyContactName = `input[data-cy="stay-home_name"]`;
-const emergencyContactPhone = `input[data-cy="stay-home_tel"]`;
-export const secondStepButton = '.btn.btn--theme--primary';
+const emergencyName = `input[data-cy="stay-home_name"]`;
+const emergencyPhone = `input[data-cy="stay-home_tel"]`;
+const changeNationality = '.passenger-01-contact-info a.vd-link';
+const changeNationalityPassenger = num => `.passenger-0${num} a.vd-link`;
+const nationalityDropDown = '.passenger-01-contact-info .expander.destination.selected';
+const nationalityDropDownPassenger = num => `.passenger-0${num} .expander.destination.selected`;
 
 export default class BookVacation1Step extends BasePage {
     setVolwassene(num, gender, fName, lName, dateOfBirth, nationality) {
-        const date = dateOfBirth.split(' ');
-        const [dd, mm, yyyy] = [date[0], date[1], date[2]];
-        $(passengerGender(num, gender)).click();
-        $(passengerFirstName(num)).setValue(fName);
-        $(passengerLastName(num)).setValue(lName);
-        $(passengerDay(num)).selectByVisibleText(dd);
-        $(passengerMonth(num)).selectByVisibleText(mm);
-        $(passengerYear(num)).selectByVisibleText(yyyy);
+        dateOfBirth = dateOfBirth.split(' ');
+        const [dd, mm, yyyy] = [dateOfBirth[0], dateOfBirth[1], dateOfBirth[2]];
+        Element.of(passengerGender(num, gender)).click();
+        Element.of(passengerFirstName(num)).enterValue(fName);
+        Element.of(passengerLastName(num)).enterValue(lName);
+        Element.of(passengerDay(num)).selectByVisibleText(dd);
+        Element.of(passengerMonth(num)).selectByVisibleText(mm);
+        Element.of(passengerYear(num)).selectByVisibleText(yyyy);
 
-        if ($(`${nationalityLocator(num)}`) != $(passengerNationality(num, nationality))) {
-            $(`.passenger-0${num} a.vd-link`).click();
-            $(`.passenger-0${num} .expander.destination.selected`).click();
-            $(passengerNationality(num, nationality)).click();
+        if (
+            Element.of(nationalityLocator(num)).getText() !=
+            Element.of(passengerNationality(num, nationality)).getText()
+        ) {
+            Element.of(changeNationalityPassenger(num)).click();
+            Element.of(nationalityDropDownPassenger(num)).click();
+            Element.of(passengerNationality(num, nationality)).click();
         }
         return this;
     }
 
-    setContactInfo(email, post, houseNum, str, residence, phone, land) {
-        $(passengerEmail).setValue(email);
-        $(passengerPostcode).setValue(post);
-        $(passengerHouseNumber).setValue(houseNum);
-        $(passengerStreet).setValue(str);
-        $(passengerCity).setValue(residence);
-        $(passengerTelephone).setValue(phone);
+    setContact(email, post, houseNum, str, residence, phone, land) {
+        Element.of(passengerEmail).enterValue(email);
+        Element.of(passengerPostcode).enterValue(post);
+        Element.of(passengerHouseNumber).enterValue(houseNum);
+        Element.of(passengerStreet).enterValue(str);
+        Element.of(passengerCity).enterValue(residence);
+        Element.of(passengerPhone).enterValue(phone);
 
-        if ($(landLocator).getText() !== land) {
-            $('.passenger-01-contact-info a.vd-link').click();
-            $('.passenger-01-contact-info .expander.destination.selected').click();
-            $(landPicker(land)).click();
+        if (Element.of(landLocator).getText() != land) {
+            Element.of(changeNationality).click();
+            Element.of(nationalityDropDown).click();
+            Element.of(landPicker(land)).click();
         }
         return this;
     }
 
     setEmergencyInfo(name, phone) {
-        $(emergencyContactName).setValue(name);
-        $(emergencyContactPhone).setValue(phone);
-        return this;
-    }
-
-    clickStep2Button() {
-        $(secondStepButton).click();
+        Element.of(emergencyName).enterValue(name);
+        Element.of(emergencyPhone).enterValue(phone);
         return this;
     }
 }
