@@ -5,7 +5,7 @@ module.exports = {
         experimentalDecorators: false
     },
     env: {
-        es6: true,
+        es10: true,
         mocha: true,
         node: true
     },
